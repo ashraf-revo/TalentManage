@@ -1,0 +1,20 @@
+<li class="list-group-item forum-thread">
+  <div class="media align-items-center">
+    <div class="media-left">
+      <div class="forum-icon-wrapper" id="forum-item-1">
+        <a class="forum-thread-icon">
+          <i class="material-icons">description</i>
+        </a>
+      </div>
+    </div>
+    <div class="media-body">
+      <a [routerLink]="['/','agency',interview.agency.id]">interview with you at {{interview.agency.agencyName}}</a>
+      <span>it will be in  {{interview.interviewDate}}</span>
+    </div>
+    <div class="media-right">
+      <div style="width:80px; text-align: right;">
+        <small class="text-muted-light">{{interview.createdDate | amTimeAgo}}</small>
+      </div>
+    </div>
+  </div>
+</li>

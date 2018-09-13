@@ -1,0 +1,174 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: A stack for deploying containerized applications in AWS Fargate.
+             This stack runs containers in a public VPC subnet, and includes a
+             public facing load balancer to register the services in.
+Parameters:
+  StackName:
+    Type: String
+    Default: env
+    Description: The name of the parent Fargate networking stack that you created. Necessary
+                 to locate and reference resources created by that stack.
+  SelectedService:
+    Type: String
+    Default: Config
+    AllowedValues: [TalentManage]
+    Description: Select Your Service
+
+Mappings:
+  Services:
+    TalentManage:
+      NAME: 'TalentManage'
+      SUBNET1:  '0'
+      SUBNET2:  '10'
+      DOCKER: 'TalentManage'
+      PATH: /
+
+
+
+Resources:
+  CloudWatchLogsGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Ref AWS::StackName
+      RetentionInDays: 365
+  PublicLoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Scheme: internet-facing
+      Subnets:
+       -  Fn::Select:
+            -  !FindInMap ['Services',{Ref: 'SelectedService'}, 'SUBNET1']
+            -  !Split
+                - ","
+                - !ImportValue
+                  Fn::Join: [':', [!Ref 'StackName', 'subnets']]
+       -  Fn::Select:
+            -  !FindInMap ['Services',{Ref: 'SelectedService'}, 'SUBNET2']
+            -  !Split
+                - ","
+                - !ImportValue
+                  Fn::Join: [':', [!Ref 'StackName', 'subnets']]
+      SecurityGroups:
+        - Fn::ImportValue:
+            !Join [':', [!Ref 'StackName', 'EcsSecurityGroup']]
+
+
+
+  TargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      TargetType: ip
+      Port:   '80'
+      Protocol: HTTP
+      VpcId:
+        Fn::ImportValue:
+          !Join [':', [!Ref 'StackName', 'VPCId']]
+      HealthCheckPath: !FindInMap ['Services',{Ref: 'SelectedService'}, 'PATH']
+      HealthCheckIntervalSeconds: 70
+      HealthyThresholdCount: 2
+      Matcher:
+        HttpCode: 200,201,302,401
+
+  PublicLoadBalancerListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    DependsOn:
+      - PublicLoadBalancer
+    Properties:
+      DefaultActions:
+        - TargetGroupArn: !Ref 'TargetGroup'
+          Type: 'forward'
+      LoadBalancerArn: !Ref 'PublicLoadBalancer'
+      Port: '80'
+      Protocol: HTTP
+
+  LoadBalancerRule:
+    Type: AWS::ElasticLoadBalancingV2::ListenerRule
+    Properties:
+      Actions:
+        - TargetGroupArn: !Ref 'TargetGroup'
+          Type: 'forward'
+      Conditions:
+        - Field: path-pattern
+          Values: ['*']
+      ListenerArn: !Ref 'PublicLoadBalancerListener'
+      Priority: '1'
+
+
+  TaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      RequiresCompatibilities:
+      - "FARGATE"
+      Cpu: '512'
+      Memory: '1024'
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      ExecutionRoleArn:
+        Fn::ImportValue:
+          !Join [':', [!Ref 'StackName', 'ECSTaskExecutionRole']]
+      ContainerDefinitions:
+        - Name: !FindInMap ['Services',{Ref: 'SelectedService'}, 'NAME']
+          Image:
+#            !Join ['',[!Ref 'AWS::AccountId',".dkr.ecr.",!Ref 'AWS::Region',".amazonaws.com/", !FindInMap ['Services',{Ref: 'SelectedService'}, 'DOCKER']]]
+            !Join ['/',["ashraf1abdelrasool", !FindInMap ['Services',{Ref: 'SelectedService'}, 'DOCKER']]]
+          PortMappings:
+            - ContainerPort: '80'
+          Environment:
+            - Name: 'VCAP_APPLICATION_URIS[0]'
+              Value: !GetAtt 'PublicLoadBalancer.DNSName'
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref AWS::StackName
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: ecs
+  Service:
+    Type: AWS::ECS::Service
+    DependsOn: LoadBalancerRule
+    Properties:
+      ServiceName: !FindInMap ['Services',{Ref: 'SelectedService'}, 'NAME']
+      Cluster:
+        Fn::ImportValue:
+          !Join [':', [!Ref 'StackName', 'ECSCluster']]
+      LaunchType: FARGATE
+      DeploymentConfiguration:
+        MaximumPercent: 200
+        MinimumHealthyPercent: 75
+      DesiredCount: '1'
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          SecurityGroups:
+            - Fn::ImportValue:
+                !Join [':', [!Ref 'StackName', 'EcsSecurityGroup']]
+          Subnets:
+           -  Fn::Select:
+                -  !FindInMap ['Services',{Ref: 'SelectedService'}, 'SUBNET1']
+                -  !Split
+                    - ","
+                    - !ImportValue
+                      Fn::Join: [':', [!Ref 'StackName', 'subnets']]
+           -  Fn::Select:
+                -  !FindInMap ['Services',{Ref: 'SelectedService'}, 'SUBNET2']
+                -  !Split
+                    - ","
+                    - !ImportValue
+                      Fn::Join: [':', [!Ref 'StackName', 'subnets']]
+      TaskDefinition: !Ref 'TaskDefinition'
+      LoadBalancers:
+        - ContainerName: !FindInMap ['Services',{Ref: 'SelectedService'}, 'NAME']
+          ContainerPort:  '80'
+          TargetGroupArn: !Ref 'TargetGroup'
+
+Outputs:
+  StackName:
+    Description: The url of the external load balancer
+    Value: !Ref 'AWS::StackName'
+    Export:
+      Name: !Join [ ':', [ !Ref 'AWS::StackName', 'StackName' ] ]
+  ExternalUrl:
+    Description: The url of the external load balancer
+    Value:  !GetAtt 'PublicLoadBalancer.DNSName'
+    Export:
+      Name: !Join [ ':', [ !Ref 'SelectedService', 'ExternalUrl' ] ]
