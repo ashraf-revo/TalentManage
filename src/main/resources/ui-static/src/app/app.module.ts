@@ -13,13 +13,14 @@ import {AuthService} from './Services/auth.service';
 import {UserService} from './Services/user.service';
 import {HttpClientModule, HttpClientXsrfModule} from '@angular/common/http';
 import {FormsModule} from '@angular/forms';
-import { BaseInComponent } from './Views/base-in/base-in.component';
-import { BaseOutComponent } from './Views/base-out/base-out.component';
-import { SignupComponent } from './Views/signup/signup.component';
-import { ProfileComponent } from './Views/profile/profile.component';
-import { AccountEditComponent } from './Views/account-edit/account-edit.component';
-import { NavComponent } from './Component/nav/nav.component';
-import { InterviewItemComponent } from './Component/interview-item/interview-item.component';
+import {BaseInComponent} from './Views/base-in/base-in.component';
+import {BaseOutComponent} from './Views/base-out/base-out.component';
+import {SignupComponent} from './Views/signup/signup.component';
+import {ProfileComponent} from './Views/profile/profile.component';
+import {AccountEditComponent} from './Views/account-edit/account-edit.component';
+import {NavComponent} from './Component/nav/nav.component';
+import {InterviewItemComponent} from './Component/interview-item/interview-item.component';
+import {MomentModule} from "angular2-moment";
 
 @NgModule({
   declarations: [
@@ -37,7 +38,7 @@ import { InterviewItemComponent } from './Component/interview-item/interview-ite
     InterviewItemComponent
   ],
   imports: [
-    BrowserModule, HttpClientModule,
+    BrowserModule, HttpClientModule, MomentModule,
     HttpClientXsrfModule.withOptions({
       cookieName: 'X-CSRF-TOKEN',
       headerName: 'X-CSRF-TOKEN',
