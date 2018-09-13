@@ -12,4 +12,4 @@ cache:
   - $HOME/.m2
 after_success:
   - docker login -u="ashraf1abdelrasool" -p="01120266849";
-  - docker push ashraf1abdelrasool/TalentManage;
+  - docker push ashraf1abdelrasool/talentmanage;
