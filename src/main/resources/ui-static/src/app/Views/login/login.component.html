@@ -11,10 +11,11 @@
   <div class="card-body">
     <form>
       <div class="form-group">
-        <input type="text"  name="user.username" [(ngModel)]="user.username" class="form-control" placeholder="Username">
+        <input type="text" name="user.username" [(ngModel)]="user.username" class="form-control" placeholder="Username">
       </div>
       <div class="form-group">
-        <input type="password" name="user.password" [(ngModel)]="user.password" class="form-control" placeholder="Password">
+        <input type="password" name="user.password" [(ngModel)]="user.password" class="form-control"
+               placeholder="Password">
       </div>
       <div class="form-group ">
         <button type="submit" (click)="login()" class="btn  btn-primary btn-block">
@@ -29,6 +30,6 @@
     </form>
   </div>
   <div class="card-footer text-center bg-white">
-    Not yet a student? <a [routerLink]="['/','signup']">Sign up</a>
+    Not yet ? <a [routerLink]="['/','signup']">Sign up</a>
   </div>
 </div>

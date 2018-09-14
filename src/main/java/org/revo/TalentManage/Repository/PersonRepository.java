@@ -7,4 +7,6 @@ import java.util.Optional;
 
 public interface PersonRepository extends CrudRepository<Person, Long> {
     Optional<Person> findByUsername(String username);
+    Optional<Person> findByEmail(String email);
+    Optional<Person> findByPhone(String phone);
 }

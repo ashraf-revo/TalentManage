@@ -5,6 +5,7 @@ export class User {
   enabled: boolean;
   username: string;
   password: string;
+  phone:string;
   accountNonExpired: boolean;
   accountNonLocked: boolean;
   credentialsNonExpired: boolean;

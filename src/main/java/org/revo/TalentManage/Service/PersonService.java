@@ -14,4 +14,6 @@ public interface PersonService {
     Optional<Person> findByUsername(String username);
 
     List<Person> findAll();
+
+    Person save(Person person);
 }

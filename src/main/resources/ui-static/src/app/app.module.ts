@@ -21,6 +21,9 @@ import {AccountEditComponent} from './Views/account-edit/account-edit.component'
 import {NavComponent} from './Component/nav/nav.component';
 import {InterviewItemComponent} from './Component/interview-item/interview-item.component';
 import {MomentModule} from "angular2-moment";
+import {BaseUserService} from "./Services/BaseUser.service";
+import {PersonService} from "./Services/person.service";
+import {AgencyService} from "./Services/agency.service";
 
 @NgModule({
   declarations: [
@@ -45,7 +48,7 @@ import {MomentModule} from "angular2-moment";
     }),
     FormsModule, RouterModule.forRoot(routes)
   ],
-  providers: [DefaultService, AuthService, UserService],
+  providers: [DefaultService, AuthService, UserService, BaseUserService,PersonService,AgencyService],
   bootstrap: [AppComponent]
 })
 export class AppModule {

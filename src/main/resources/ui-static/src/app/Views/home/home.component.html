@@ -16,10 +16,7 @@
         </div>
       </div>
       <ul class="list-group list-group-fit mb-0">
-        <t-interview-item></t-interview-item>
-        <t-interview-item></t-interview-item>
-        <t-interview-item></t-interview-item>
-
+        <t-interview-item *ngFor="let interview of interviews" [interview]="interview"></t-interview-item>
       </ul>
     </div>
   </div>

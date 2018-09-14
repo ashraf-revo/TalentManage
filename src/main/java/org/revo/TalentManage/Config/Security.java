@@ -1,12 +1,11 @@
 package org.revo.TalentManage.Config;
 
-import org.revo.TalentManage.Repository.AgencyRepository;
-import org.revo.TalentManage.Repository.PersonRepository;
 import org.revo.TalentManage.Service.AgencyService;
 import org.revo.TalentManage.Service.PersonService;
 import org.revo.TalentManage.Service.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.AuditorAware;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
@@ -19,6 +18,8 @@ import reactor.core.publisher.Mono;
 
 import static org.revo.TalentManage.Domain.base.Role.*;
 import static org.revo.TalentManage.Domain.base.Role.Paths.*;
+import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpMethod.POST;
 
 @EnableWebFluxSecurity
 public class Security {
@@ -30,11 +31,14 @@ public class Security {
         }).and()
                 .authorizeExchange()
 
-                .pathMatchers(PERSON_PATH, PERSON_PATH + "/*/**").hasRole(PERSON.getRole())
+                .pathMatchers(POST, "/api/person").permitAll()
+                .pathMatchers(POST, "/api/agency").permitAll()
+                .pathMatchers(PERSON_PATH, PERSON_PATH + "/*/**").authenticated()
                 .pathMatchers(ADMIN_PATH, ADMIN_PATH + "/*/**").hasRole(ADMIN.getRole())
-                .pathMatchers(AGENCY_PATH, AGENCY_PATH + "/*/**").hasRole(AGENCY.getRole())
+                .pathMatchers(AGENCY_PATH, AGENCY_PATH + "/*/**").authenticated()
 
                 .pathMatchers("/auth/user").authenticated()
+                .pathMatchers(GET, "/api/*/**").authenticated()
                 .anyExchange().permitAll()
                 .and().csrf().and()
                 .formLogin()
@@ -61,10 +65,18 @@ public class Security {
     public ReactiveUserDetailsService userDetailsService(PersonService personService, AgencyService agencyService) {
         return s -> {
             Mono<UserDetails> personMono = personService.findByUsername(s)
+                    .map(it -> {
+                        it.setInterviews(null);
+                        return it;
+                    })
                     .map(Mono::just)
                     .orElseGet(Mono::empty)
                     .cast(UserDetails.class);
             Mono<UserDetails> agencyMono = agencyService.findByUsername(s)
+                    .map(it -> {
+                        it.setInterviews(null);
+                        return it;
+                    })
                     .map(Mono::just)
                     .orElseGet(Mono::empty)
                     .cast(UserDetails.class);

@@ -4,6 +4,7 @@ import org.revo.TalentManage.Domain.Person;
 import org.revo.TalentManage.Repository.PersonRepository;
 import org.revo.TalentManage.Service.PersonService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,6 +17,8 @@ import static java.util.stream.Collectors.toList;
 public class PersonServiceImpl implements PersonService {
     @Autowired
     private PersonRepository personRepository;
+    @Autowired
+    private PasswordEncoder encoder;
 
     @Override
     public Long count() {
@@ -34,7 +37,13 @@ public class PersonServiceImpl implements PersonService {
 
     @Override
     public List<Person> findAll() {
-        return StreamSupport.stream(personRepository.findAll().spliterator(),false).collect(toList());
+        return StreamSupport.stream(personRepository.findAll().spliterator(), false).collect(toList());
+    }
+
+    @Override
+    public Person save(Person person) {
+        person.setPassword(encoder.encode(person.getPassword()));
+        return personRepository.save(person);
     }
 
 

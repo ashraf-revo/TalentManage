@@ -13,16 +13,24 @@ org:
         username: revo
         type: '010'
         password: '{bcrypt}$2a$10$qH2vQoXFwqQi1u08/wHLyefyPcXyMTphYCZ3t6R65akJEsKwySyKy'
+        phone: 01120266849
       agencies:
-      - email: revo
-        username: revo
+      - email: ashraf
+        username: ashraf
         type: '001'
         password: '{bcrypt}$2a$10$qH2vQoXFwqQi1u08/wHLyefyPcXyMTphYCZ3t6R65akJEsKwySyKy'
+        agencyName: big love
+        addresses.country: egypt
+        addresses.city: cairo
+        addresses.street: ostrad st
+        phone: 01120266849
+
+
 spring:
   jpa:
     hibernate:
       ddl-auto: update
-#  datasource:
-#    url: jdbc:mysql://localhost:3306/talentmanage
-#    username: root
-#    password:
+  datasource:
+    url: jdbc:mysql://localhost:3306/talentmanage
+    username: root
+    password:
