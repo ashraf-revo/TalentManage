@@ -122,11 +122,12 @@ Resources:
           Environment:
             - Name: 'VCAP_APPLICATION_URIS[0]'
               Value: !GetAtt 'PublicLoadBalancer.DNSName'
-            - Name: 'SPRING_JPA_DATASOURCE_URL'
-              Value: "jdbc:mysql://db.cnzzc57z8tgk.us-east-1.rds.amazonaws.com:3306/talentmanage"
-            - Name: 'SPRING_JPA_DATASOURCE_USERNAME'
+            - Name: 'SPRING_DATASOURCE_URL'
+              Value: !ImportValue
+                      Fn::Join: [':', [!Ref 'Db', 'url']]
+            - Name: 'SPRING_DATASOURCE_USERNAME'
               Value: 'ashraf_revo'
-            - Name: 'SPRING_JPA_DATASOURCE_PASSWORD'
+            - Name: 'SPRING_DATASOURCE_PASSWORD'
               Value: 'ashraf_revo'
           LogConfiguration:
             LogDriver: awslogs

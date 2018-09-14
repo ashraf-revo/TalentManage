@@ -13,3 +13,10 @@ cache:
 after_success:
   - docker login -u="ashraf1abdelrasool" -p="01120266849";
   - docker push ashraf1abdelrasool/talentmanage;
+deploy:
+ - provider: cloudfoundry
+   username: "ashraf1revo@gmail.com"
+   password: "01120266849ASHra\\;"
+   api: https://api.run.pivotal.io
+   organization: ashraf1revo
+   space: development

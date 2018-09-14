@@ -18,11 +18,11 @@ org:
         username: revo
         type: '001'
         password: '{bcrypt}$2a$10$qH2vQoXFwqQi1u08/wHLyefyPcXyMTphYCZ3t6R65akJEsKwySyKy'
-spring:
-  jpa:
-    hibernate:
-      ddl-auto: update
-  datasource:
-    url: jdbc:mysql://localhost:3306/talentmanage
-    username: root
-    password:
+#spring:
+#  jpa:
+#    hibernate:
+#      ddl-auto: update
+#  datasource:
+#    url: jdbc:mysql://localhost:3306/talentmanage
+#    username: root
+#    password:
