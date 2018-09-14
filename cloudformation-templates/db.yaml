@@ -1,0 +1,172 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "db"
+Parameters:
+  DBName:
+    Default: 'talentmanage'
+    Description: The database name
+    Type: String
+    MinLength: '1'
+    MaxLength: '64'
+    AllowedPattern: '[a-zA-Z][a-zA-Z0-9]*'
+    ConstraintDescription: must begin with a letter and contain only alphanumeric
+      characters.
+
+Mappings:
+  DBSubnetConfig:
+    VPC:
+      CIDR: '172.30.0.0/16'
+    Subnet0:
+      CIDR: '172.30.0.0/24'
+    Subnet1:
+      CIDR: '172.30.16.0/24'
+    Subnet2:
+      CIDR: '172.30.32.0/24'
+
+
+Resources:
+
+  DBVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      CidrBlock: !FindInMap ['DBSubnetConfig', 'VPC', 'CIDR']
+  DBSubnet0:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone:
+         Fn::Select:
+         - 0
+         - Fn::GetAZs: {Ref: 'AWS::Region'}
+      VpcId: !Ref 'DBVPC'
+      CidrBlock: !FindInMap ['DBSubnetConfig', 'Subnet0', 'CIDR']
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: Subnet0
+  DBSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone:
+         Fn::Select:
+         - 1
+         - Fn::GetAZs: {Ref: 'AWS::Region'}
+      VpcId: !Ref 'DBVPC'
+      CidrBlock: !FindInMap ['DBSubnetConfig', 'Subnet1', 'CIDR']
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: Subnet1
+  DBSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone:
+         Fn::Select:
+         - 2
+         - Fn::GetAZs: {Ref: 'AWS::Region'}
+      VpcId: !Ref 'DBVPC'
+      CidrBlock: !FindInMap ['DBSubnetConfig', 'Subnet2', 'CIDR']
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: Subnet2
+  DBInternetGateway:
+    Type: AWS::EC2::InternetGateway
+  GatewayAttachement:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref 'DBVPC'
+      InternetGatewayId: !Ref 'DBInternetGateway'
+  DBRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref 'DBVPC'
+  DBPublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: GatewayAttachement
+    Properties:
+      RouteTableId: !Ref 'DBRouteTable'
+      DestinationCidrBlock: '0.0.0.0/0'
+      GatewayId: !Ref 'DBInternetGateway'
+
+  DBSubnet0Association:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref DBSubnet0
+      RouteTableId: !Ref DBRouteTable
+  DBSubnet1Association:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref DBSubnet1
+      RouteTableId: !Ref DBRouteTable
+  DBSubnet2Association:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref DBSubnet2
+      RouteTableId: !Ref DBRouteTable
+
+
+
+
+
+
+
+
+
+
+  RDSAccessSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: ECS Security Group
+      VpcId:
+        Ref: DBVPC
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: '3306'
+        ToPort: '3306'
+        CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+      - IpProtocol: -1
+        CidrIp: 0.0.0.0/0
+
+  DbSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription:
+        Fn::Join:
+        - ''
+        - - 'RDS Subnet Group for '
+          - Ref: AWS::StackName
+      SubnetIds:
+      - Ref: DBSubnet0
+      - Ref: DBSubnet1
+      - Ref: DBSubnet2
+  DbInstance:
+    Type: AWS::RDS::DBInstance
+    DeletionPolicy: Snapshot
+    DependsOn:
+    - DbSubnetGroup
+    - RDSAccessSecurityGroup
+    Properties:
+      DBName: !Ref 'DBName'
+      AllocatedStorage: '5'
+      DBInstanceClass: db.t2.micro
+      Engine: MySQL
+      EngineVersion: 5.7.22
+      AllowMajorVersionUpgrade: 'false'
+      DBInstanceIdentifier:
+        Ref: AWS::StackName
+      DBSubnetGroupName:
+        Ref: DbSubnetGroup
+      MasterUsername:  'ashraf_revo'
+      MasterUserPassword:  'ashraf_revo'
+      PubliclyAccessible: 'true'
+      VPCSecurityGroups:
+      - Ref: RDSAccessSecurityGroup
+Outputs:
+  url:
+    Description: JDBC connection url
+    Value: !Join ['', ['jdbc:mysql://', !GetAtt [DbInstance, Endpoint.Address], ':', !GetAtt [
+          DbInstance, Endpoint.Port], /, !Ref 'DBName']]
+    Export:
+      Name: !Join [ ':', [ !Ref 'AWS::StackName', 'url' ] ]
