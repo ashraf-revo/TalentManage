@@ -8,7 +8,7 @@
       </div>
     </div>
     <div class="media-body" *ngIf="user">
-      a interview with <a [routerLink]="['/','profile',interview.agency.id]">
+      a interview with <a [routerLink]="['/','profile',user.type==='010'?interview.agency.id:interview.person.id]">
       {{user.type==='010'?interview.agency.agencyName:interview.person.username}}</a>
       <span> it will be   {{interview.interviewDate | amTimeAgo}}  from now </span>
     </div>
