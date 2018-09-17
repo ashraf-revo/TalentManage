@@ -1,4 +1,5 @@
 import {User} from "./user";
 
-export class Person extends User{
+export class Person extends User {
+  skills: string[];
 }

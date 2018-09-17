@@ -24,6 +24,7 @@ import {MomentModule} from "angular2-moment";
 import {BaseUserService} from "./Services/BaseUser.service";
 import {PersonService} from "./Services/person.service";
 import {AgencyService} from "./Services/agency.service";
+import {PersonsComponent} from './Views/persons/persons.component';
 
 @NgModule({
   declarations: [
@@ -38,7 +39,8 @@ import {AgencyService} from "./Services/agency.service";
     ProfileComponent,
     AccountEditComponent,
     NavComponent,
-    InterviewItemComponent
+    InterviewItemComponent,
+    PersonsComponent
   ],
   imports: [
     BrowserModule, HttpClientModule, MomentModule,
@@ -48,7 +50,7 @@ import {AgencyService} from "./Services/agency.service";
     }),
     FormsModule, RouterModule.forRoot(routes)
   ],
-  providers: [DefaultService, AuthService, UserService, BaseUserService,PersonService,AgencyService],
+  providers: [DefaultService, AuthService, UserService, BaseUserService, PersonService, AgencyService],
   bootstrap: [AppComponent]
 })
 export class AppModule {

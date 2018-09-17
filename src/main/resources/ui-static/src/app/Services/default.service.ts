@@ -8,7 +8,7 @@ import {AuthService} from './auth.service';
 export class DefaultService {
   public url = '';
   private _lastRoute: NavigationEnd = null;
-  private protectedUrl: string[] = ['home','account','profile'];
+  private protectedUrl: string[] = ["persons",'home','account','profile'];
   private unProtectedUrl: string[] = ['','login','signup'];
 
   constructor() {

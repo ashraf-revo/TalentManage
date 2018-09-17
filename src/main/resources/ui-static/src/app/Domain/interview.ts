@@ -4,9 +4,8 @@ import {Person} from "./Person";
 export class Interview {
   id: string;
   createdDate: string;
-  agency: Agency;
-  person: Person;
+  agency: Agency=new Agency();
+  person: Person=new Person();
   interviewDate: string;
-  interViewState: string;
   createdBy: number;
 }

@@ -1,0 +1,29 @@
+<ol class="breadcrumb">
+  <li class="breadcrumb-item"><a [routerLink]="['/','home']">Home</a></li>
+  <li class="breadcrumb-item active">Persons</li>
+</ol>
+<div class="row">
+  <div class="col-lg-10">
+    <div class="card">
+      <div class="card-header bg-white">
+        <div class="media">
+          <div class="media-body">
+            <h4 class="card-title">Persons</h4>
+          </div>
+        </div>
+      </div>
+      <ul class="list-group list-group-fit">
+        <li class="list-group-item" *ngFor="let p of persons">
+          <a [routerLink]="['/','profile',p.id]">
+              <span class="media align-items-center">
+                <span class="media-left">
+                  <img src="assets/images/best.png" alt="" class="rounded-circle" width="35">
+                </span>
+                <span class="media-body media-middle">{{p.username}}</span>
+              </span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>

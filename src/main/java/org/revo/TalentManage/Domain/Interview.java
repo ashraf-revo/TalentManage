@@ -26,7 +26,6 @@ public class Interview {
     @JoinColumn
     private Person person;
     private Date interviewDate;
-    private InterviewState interviewState = InterviewState.BINDING;
     @CreatedBy
     private Long createdBy;
 }

@@ -32,6 +32,7 @@ public class TalentManageApplication {
                     or(GET("/home")).
                     or(GET("/login")).
                     or(GET("/signup")).
+                    or(GET("/persons")).
                     or(GET("/profile/{id}")).
                     or(GET("/account/edit"));
 

@@ -67,6 +67,7 @@ public class Security {
             Mono<UserDetails> personMono = personService.findByUsername(s)
                     .map(it -> {
                         it.setInterviews(null);
+                        it.setSkills(null);
                         return it;
                     })
                     .map(Mono::just)

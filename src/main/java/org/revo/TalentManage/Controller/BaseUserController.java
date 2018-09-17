@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.StreamSupport;
 
 import static java.util.stream.Collectors.toList;
 
@@ -45,6 +47,33 @@ public class BaseUserController {
         return ResponseEntity.ok().body(agencyService.save(agency));
     }
 
+    @GetMapping("persons")
+    public Iterable<Person> people() {
+        return StreamSupport.stream(personRepository.findAll().spliterator(), false)
+                .map(it -> {
+                    it.setInterviews(null);
+                    return it;
+                })
+
+                .collect(toList());
+    }
+
+    @GetMapping("user/{id}")
+    public BaseUser user(@PathVariable("id") Long id) {
+
+        Optional<Person> byId1 = personRepository.findById(id);
+        if (byId1.isPresent()) {
+            byId1.get().setInterviews(null);
+            byId1.get().setSkills(null);
+            return byId1.get();
+        }
+        Optional<Agency> byId2 = agencyRepository.findById(id);
+        if (byId2.isPresent()) {
+            byId2.get().setInterviews(null);
+            return byId2.get();
+        }
+        return null;
+    }
 
     @GetMapping("interviews")
     public List<Interview> interviews(@AuthenticationPrincipal BaseUser baseUser) {

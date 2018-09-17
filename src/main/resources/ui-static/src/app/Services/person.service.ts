@@ -20,7 +20,15 @@ export class PersonService {
     return this._http.post(this.url, person);
   }
 
-  profile(it:string): Observable<Person> {
-    return this._http.get<Person>(this.url + "/profile/"+it)
+  profile(it: string): Observable<Person> {
+    return this._http.get<Person>(this.url + "/profile/" + it)
+  }
+
+  persons(): Observable<Person[]> {
+    return this._http.get<Person[]>(this.url + "s");
+  }
+
+  skills(): Observable<string[]> {
+    return this._http.get<string[]>(this.url + "/skills");
   }
 }

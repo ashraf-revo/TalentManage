@@ -9,13 +9,18 @@ org:
   revo:
     env:
       people:
-      - email: revo
+      - email: revo@gmail.com
         username: revo
         type: '010'
         password: '{bcrypt}$2a$10$qH2vQoXFwqQi1u08/wHLyefyPcXyMTphYCZ3t6R65akJEsKwySyKy'
         phone: 01120266849
+        skills:
+        - java
+        - hibernate
+        - spring boot
+        - again
       agencies:
-      - email: ashraf
+      - email: ashraf@gmail.com
         username: ashraf
         type: '001'
         password: '{bcrypt}$2a$10$qH2vQoXFwqQi1u08/wHLyefyPcXyMTphYCZ3t6R65akJEsKwySyKy'

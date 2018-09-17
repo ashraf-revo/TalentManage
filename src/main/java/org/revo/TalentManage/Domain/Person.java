@@ -23,4 +23,6 @@ public class Person extends BaseUser {
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "person")
     private List<Interview> interviews = new ArrayList<>();
+    @ElementCollection(fetch = FetchType.EAGER)
+    public List<String> skills;
 }

@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
+import {PersonService} from "../../Services/person.service";
 
 @Component({
   selector: 't-account-edit',
@@ -6,10 +7,19 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./account-edit.component.css']
 })
 export class AccountEditComponent implements OnInit {
+  skills: string[] = [];
+  skill: string = "";
 
-  constructor() { }
-
-  ngOnInit() {
+  constructor(private _personService: PersonService) {
   }
 
+  ngOnInit() {
+    this._personService.skills().subscribe(it => {
+      this.skills = it;
+    });
+  }
+
+  append() {
+    this.skills.push(this.skill);
+  }
 }

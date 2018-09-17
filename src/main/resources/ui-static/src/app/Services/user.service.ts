@@ -1,10 +1,9 @@
 import {Injectable} from '@angular/core';
 import {Observable, of} from 'rxjs';
 import {User} from '../Domain/user';
-import {filter, map, tap} from 'rxjs/internal/operators';
+import {tap} from 'rxjs/internal/operators';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {DefaultService} from './default.service';
-import {HttpDownloadProgressEvent} from "@angular/common/http/src/response";
 
 @Injectable({
   providedIn: 'root'
@@ -26,7 +25,7 @@ export class UserService {
     if (this._cacheUser.has(id)) {
       return of(this._cacheUser.get(id));
     }
-    return this._http.get<User>(this.url + 'api/user/' + id)
+    return this._http.get<User>('/api/user/' + id)
       .pipe(tap(it => this._cacheUser.set(id, it)));
   }
 
